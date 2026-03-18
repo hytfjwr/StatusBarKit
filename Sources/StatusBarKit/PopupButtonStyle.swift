@@ -15,7 +15,7 @@ public struct PopupButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         PopupButtonBody(
             configuration: configuration,
-            cornerRadius: cornerRadius
+            cornerRadius: cornerRadius,
         )
     }
 }
@@ -32,7 +32,7 @@ private struct PopupButtonBody: View {
         configuration.label
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(isHovered || configuration.isPressed ? .white.opacity(0.08) : .clear)
+                    .fill(isHovered || configuration.isPressed ? .white.opacity(0.08) : .clear),
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .overlay(PointingHandCursor())

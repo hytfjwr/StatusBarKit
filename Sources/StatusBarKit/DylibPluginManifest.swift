@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - DylibPluginManifest
+
 /// On-disk manifest for a dynamically loaded plugin bundle (.statusplugin).
 /// Read from manifest.json inside each plugin bundle directory.
 public struct DylibPluginManifest: Codable, Sendable {
@@ -44,7 +46,7 @@ public struct DylibPluginManifest: Codable, Sendable {
         description: String? = nil,
         author: String? = nil,
         homepage: String? = nil,
-        sha256: String? = nil
+        sha256: String? = nil,
     ) {
         self.id = id
         self.name = name
@@ -59,7 +61,7 @@ public struct DylibPluginManifest: Codable, Sendable {
     }
 }
 
-// MARK: - Semantic Version Parsing
+// MARK: - SemanticVersion
 
 /// Minimal semver representation for compatibility checks.
 public struct SemanticVersion: Sendable, Comparable {
@@ -69,10 +71,12 @@ public struct SemanticVersion: Sendable, Comparable {
 
     public init?(_ string: String) {
         let parts = string.split(separator: ".").compactMap { Int($0) }
-        guard parts.count >= 2 else { return nil }
-        self.major = parts[0]
-        self.minor = parts[1]
-        self.patch = parts.count >= 3 ? parts[2] : 0
+        guard parts.count >= 2 else {
+            return nil
+        }
+        major = parts[0]
+        minor = parts[1]
+        patch = parts.count >= 3 ? parts[2] : 0
     }
 
     /// Creates a semantic version from individual components.
@@ -87,14 +91,20 @@ public struct SemanticVersion: Sendable, Comparable {
     /// - Major version must match exactly
     /// - Plugin's minor version must be ≤ host's minor version
     ///   (plugin may use APIs added in its minor version)
-    public func isCompatible(with pluginVersion: SemanticVersion) -> Bool {
-        guard major == pluginVersion.major else { return false }
+    public func isCompatible(with pluginVersion: Self) -> Bool {
+        guard major == pluginVersion.major else {
+            return false
+        }
         return pluginVersion.minor <= minor
     }
 
-    public static func < (lhs: SemanticVersion, rhs: SemanticVersion) -> Bool {
-        if lhs.major != rhs.major { return lhs.major < rhs.major }
-        if lhs.minor != rhs.minor { return lhs.minor < rhs.minor }
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        if lhs.major != rhs.major {
+            return lhs.major < rhs.major
+        }
+        if lhs.minor != rhs.minor {
+            return lhs.minor < rhs.minor
+        }
         return lhs.patch < rhs.patch
     }
 }

@@ -13,8 +13,9 @@ public final class GraphDataBuffer {
         buffer = Array(repeating: 0, count: capacity)
     }
 
-    // swiftlint:disable:next empty_count
-    public var isEmpty: Bool { count == 0 }
+    public var isEmpty: Bool {
+        count == 0 // swiftlint:disable:this empty_count
+    }
 
     /// Append a value to the buffer. Overwrites the oldest entry when full.
     public func push(_ value: Double) {

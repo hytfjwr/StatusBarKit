@@ -12,13 +12,17 @@ public enum ConfigValue: Codable, Sendable, Equatable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         // Order matters: Bool before Int (YAML `true`/`false`), Int before Double
-        if let v = try? container.decode(Bool.self) { self = .bool(v) }
-        else if let v = try? container.decode(Int.self) { self = .int(v) }
-        else if let v = try? container.decode(Double.self) { self = .double(v) }
-        else if let v = try? container.decode(String.self) { self = .string(v) }
-        else {
+        if let v = try? container.decode(Bool.self) {
+            self = .bool(v)
+        } else if let v = try? container.decode(Int.self) {
+            self = .int(v)
+        } else if let v = try? container.decode(Double.self) {
+            self = .double(v)
+        } else if let v = try? container.decode(String.self) {
+            self = .string(v)
+        } else {
             throw DecodingError.dataCorruptedError(
-                in: container, debugDescription: "Unsupported config value type"
+                in: container, debugDescription: "Unsupported config value type",
             )
         }
     }
@@ -26,31 +30,43 @@ public enum ConfigValue: Codable, Sendable, Equatable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
-        case .string(let v): try container.encode(v)
-        case .bool(let v): try container.encode(v)
-        case .int(let v): try container.encode(v)
-        case .double(let v): try container.encode(v)
+        case let .string(v): try container.encode(v)
+        case let .bool(v): try container.encode(v)
+        case let .int(v): try container.encode(v)
+        case let .double(v): try container.encode(v)
         }
     }
 
-    // Convenience accessors
+    /// Convenience accessors
     public var stringValue: String? {
-        if case .string(let v) = self { return v } else { return nil }
+        if case let .string(v) = self {
+            v
+        } else {
+            nil
+        }
     }
 
     public var boolValue: Bool? {
-        if case .bool(let v) = self { return v } else { return nil }
+        if case let .bool(v) = self {
+            v
+        } else {
+            nil
+        }
     }
 
     public var intValue: Int? {
-        if case .int(let v) = self { return v } else { return nil }
+        if case let .int(v) = self {
+            v
+        } else {
+            nil
+        }
     }
 
     public var doubleValue: Double? {
         switch self {
-        case .double(let v): return v
-        case .int(let v): return Double(v)
-        default: return nil
+        case let .double(v): v
+        case let .int(v): Double(v)
+        default: nil
         }
     }
 }
@@ -124,5 +140,13 @@ public final class WidgetConfigRegistry {
     /// Notify that a widget setting changed (triggers YAML write-back).
     public func notifySettingsChanged() {
         onSettingsChanged?()
+    }
+
+    /// Reset all state. Intended for testing only.
+    @_spi(Testing)
+    public func reset() {
+        loadedConfig = [:]
+        providers = [:]
+        onSettingsChanged = nil
     }
 }

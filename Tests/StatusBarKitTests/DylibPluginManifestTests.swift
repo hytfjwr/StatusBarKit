@@ -1,11 +1,10 @@
 import Foundation
-import Testing
 @testable import StatusBarKit
+import Testing
 
-@Suite("DylibPluginManifest")
 struct DylibPluginManifestTests {
-    @Test("Codable round-trip with all fields")
-    func fullRoundTrip() throws {
+    @Test
+    func `Codable round-trip with all fields`() throws {
         let original = DylibPluginManifest(
             id: "com.example.test",
             name: "Test Plugin",
@@ -16,7 +15,7 @@ struct DylibPluginManifestTests {
             description: "A test plugin",
             author: "Test Author",
             homepage: "https://example.com",
-            sha256: "abc123"
+            sha256: "abc123",
         )
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(DylibPluginManifest.self, from: data)
@@ -32,14 +31,14 @@ struct DylibPluginManifestTests {
         #expect(decoded.sha256 == original.sha256)
     }
 
-    @Test("Codable round-trip with optional fields nil")
-    func minimalRoundTrip() throws {
+    @Test
+    func `Codable round-trip with optional fields nil`() throws {
         let original = DylibPluginManifest(
             id: "com.example.minimal",
             name: "Minimal",
             version: "0.1.0",
             statusBarKitVersion: "1.0.0",
-            swiftVersion: "6.2"
+            swiftVersion: "6.2",
         )
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(DylibPluginManifest.self, from: data)
@@ -51,14 +50,14 @@ struct DylibPluginManifestTests {
         #expect(decoded.sha256 == nil)
     }
 
-    @Test("Default entry symbol")
-    func defaultEntrySymbol() {
+    @Test
+    func `Default entry symbol`() {
         let manifest = DylibPluginManifest(
             id: "com.example.default",
             name: "Default",
             version: "1.0.0",
             statusBarKitVersion: "1.0.0",
-            swiftVersion: "6.2"
+            swiftVersion: "6.2",
         )
         #expect(manifest.entrySymbol == "createStatusBarPlugin")
     }

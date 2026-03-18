@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - PopupSection
+// MARK: - PopupSectionHeader
 
 /// Apple-style section header for popup menus.
 /// Small, uppercase, secondary color — matches System Settings / Control Center style.
@@ -39,7 +39,7 @@ public struct PopupRow<Trailing: View>: View {
         iconColor: Color = .primary,
         label: String,
         @ViewBuilder trailing: () -> Trailing = { EmptyView() },
-        action: @escaping () -> Void
+        action: @escaping () -> Void,
     ) {
         self.icon = icon
         self.iconColor = iconColor
@@ -93,7 +93,7 @@ public struct PopupStatusBadge: View {
             .padding(.vertical, 2)
             .background(
                 Capsule(style: .continuous)
-                    .fill(color.opacity(0.12))
+                    .fill(color.opacity(0.12)),
             )
     }
 }

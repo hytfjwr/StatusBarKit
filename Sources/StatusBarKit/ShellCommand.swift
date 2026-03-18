@@ -1,10 +1,14 @@
 import Foundation
 
+// MARK: - ShellCommandError
+
 /// Errors thrown by ``ShellCommand``.
 public enum ShellCommandError: Error {
     /// The process did not finish within the specified timeout interval.
     case timeout
 }
+
+// MARK: - ShellCommand
 
 public enum ShellCommand {
     private static let defaultEnvironment: [String: String] = ProcessInfo.processInfo.environment.merging([

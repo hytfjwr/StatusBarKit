@@ -1,24 +1,23 @@
 import Foundation
-import Testing
 @testable import StatusBarKit
+import Testing
 
-@Suite("WidgetLayoutEntry")
 struct WidgetLayoutEntryTests {
-    @Test("Default isVisible is true")
-    func defaultVisibility() {
+    @Test
+    func `Default isVisible is true`() {
         let entry = WidgetLayoutEntry(id: "cpu", section: .left, sortIndex: 0)
         #expect(entry.isVisible == true)
     }
 
-    @Test("Codable round-trip")
-    func codableRoundTrip() throws {
+    @Test
+    func `Codable round-trip`() throws {
         let original = WidgetLayoutEntry(id: "weather", section: .center, sortIndex: 2, isVisible: false)
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(WidgetLayoutEntry.self, from: data)
         #expect(decoded == original)
     }
 
-    @Test("Equatable")
+    @Test
     func equatable() {
         let a = WidgetLayoutEntry(id: "a", section: .left, sortIndex: 0)
         let b = WidgetLayoutEntry(id: "a", section: .left, sortIndex: 0)
@@ -27,8 +26,8 @@ struct WidgetLayoutEntryTests {
         #expect(a != c)
     }
 
-    @Test("Identifiable uses id")
-    func identifiable() {
+    @Test
+    func `Identifiable uses id`() {
         let entry = WidgetLayoutEntry(id: "docker", section: .right, sortIndex: 1)
         #expect(entry.id == "docker")
     }
