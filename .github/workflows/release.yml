@@ -1,0 +1,116 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26'
+
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
+
+  release:
+    needs: test
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select Xcode 26
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26'
+
+      - name: Calculate next version
+        id: version
+        run: |
+          LATEST=$(git tag -l 'v*' --sort=-v:refname | head -1)
+          if [ -z "$LATEST" ]; then
+            LATEST="v0.0.0"
+          fi
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST#v}"
+          case "${{ github.event.inputs.bump }}" in
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH + 1)) ;;
+          esac
+          VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Releasing v${VERSION}"
+
+      - name: Create release branch
+        run: git checkout -b release/${{ steps.version.outputs.tag }}
+
+      - name: Update CHANGELOG
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DATE=$(date +%Y-%m-%d)
+          perl -pi -e "s/## \[Unreleased\]/## [Unreleased]\n\n## [${VERSION}] - ${DATE}/" CHANGELOG.md
+
+      - name: Commit version bump
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore: release ${TAG}"
+
+      - name: Build release binary
+        run: swift build -c release
+
+      - name: Package artifacts
+        run: make package
+
+      - name: Push branch and tag
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          BRANCH="release/${TAG}"
+          git tag "$TAG"
+          git push origin "$BRANCH" "$TAG"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          gh release create "$TAG" \
+            StatusBarKit.zip \
+            --title "$TAG" \
+            --generate-notes
+
+      - name: Create version bump PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          gh pr create \
+            --title "chore: release ${TAG}" \
+            --body "Update CHANGELOG for ${TAG}." \
+            --head "release/${TAG}" \
+            --base main
