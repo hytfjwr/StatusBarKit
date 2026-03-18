@@ -6,3 +6,4 @@ DerivedData/
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
 Package.resolved
+StatusBarKit.zip
