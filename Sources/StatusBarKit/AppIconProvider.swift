@@ -15,11 +15,11 @@ public final class AppIconProvider {
     private init() {
         // Build the installed-app index off the main thread at startup
         Task.detached(priority: .utility) {
-            let index = AppIconProvider.scanInstalledApps()
+            let index = Self.scanInstalledApps()
             await MainActor.run {
-                AppIconProvider.shared.appPathIndex = index
+                Self.shared.appPathIndex = index
                 // Clear negative cache entries so missed icons can be retried with the index
-                AppIconProvider.shared.cache = AppIconProvider.shared.cache.filter { $0.value != nil }
+                Self.shared.cache = Self.shared.cache.filter { $0.value != nil }
             }
         }
     }
@@ -48,9 +48,13 @@ public final class AppIconProvider {
         var caseInsensitiveMatch: NSRunningApplication?
 
         for app in runningApps {
-            guard let name = app.localizedName else { continue }
+            guard let name = app.localizedName else {
+                continue
+            }
             if name == appName {
-                if let icon = app.icon { return icon }
+                if let icon = app.icon {
+                    return icon
+                }
                 break
             }
             if caseInsensitiveMatch == nil, name.lowercased() == lowerName {
@@ -71,10 +75,8 @@ public final class AppIconProvider {
             "\(NSHomeDirectory())/Applications/\(appName).app",
         ]
 
-        for path in directPaths {
-            if FileManager.default.fileExists(atPath: path) {
-                return NSWorkspace.shared.icon(forFile: path)
-            }
+        for path in directPaths where FileManager.default.fileExists(atPath: path) {
+            return NSWorkspace.shared.icon(forFile: path)
         }
 
         // 3. Fall back to installed app index (available once background scan completes)
@@ -87,7 +89,7 @@ public final class AppIconProvider {
 
     /// Scans /Applications directories and reads Info.plist to build name → path index.
     /// Designed to run off the main thread via Task.detached.
-    private nonisolated static func scanInstalledApps() -> [String: String] {
+    nonisolated private static func scanInstalledApps() -> [String: String] {
         var index: [String: String] = [:]
 
         let searchDirs = [
@@ -101,11 +103,15 @@ public final class AppIconProvider {
             guard let enumerator = fm.enumerator(
                 at: URL(fileURLWithPath: dir),
                 includingPropertiesForKeys: nil,
-                options: [.skipsHiddenFiles]
-            ) else { continue }
+                options: [.skipsHiddenFiles],
+            ) else {
+                continue
+            }
 
             while let url = enumerator.nextObject() as? URL {
-                guard url.pathExtension == "app" else { continue }
+                guard url.pathExtension == "app" else {
+                    continue
+                }
                 // Don't recurse into .app bundles
                 enumerator.skipDescendants()
 
@@ -118,9 +124,11 @@ public final class AppIconProvider {
                 let plistURL = url.appendingPathComponent("Contents/Info.plist")
                 guard let data = try? Data(contentsOf: plistURL),
                       let plist = try? PropertyListSerialization.propertyList(
-                          from: data, format: nil
+                          from: data, format: nil,
                       ) as? [String: Any]
-                else { continue }
+                else {
+                    continue
+                }
 
                 if let displayName = plist["CFBundleDisplayName"] as? String {
                     index[displayName.lowercased()] = path

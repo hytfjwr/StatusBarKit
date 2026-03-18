@@ -1,7 +1,7 @@
 import Testing
 @testable @_spi(Testing) import StatusBarKit
 
-// MARK: - Mock
+// MARK: - MockConfigProvider
 
 @MainActor
 private final class MockConfigProvider: WidgetConfigProvider {
@@ -21,16 +21,17 @@ private final class MockConfigProvider: WidgetConfigProvider {
     }
 }
 
-// MARK: - Tests
+// MARK: - WidgetConfigRegistryTests
 
-@Suite("WidgetConfigRegistry")
 struct WidgetConfigRegistryTests {
-    @MainActor private func resetRegistry() {
+    @MainActor
+    private func resetRegistry() {
         WidgetConfigRegistry.shared.reset()
     }
 
-    @Test("values(for:) returns loaded config for known widget ID")
-    @MainActor func valuesForKnownID() {
+    @Test
+    @MainActor
+    func `values(for:) returns loaded config for known widget ID`() {
         resetRegistry()
         let registry = WidgetConfigRegistry.shared
         let config: [String: [String: ConfigValue]] = [
@@ -42,8 +43,9 @@ struct WidgetConfigRegistryTests {
         #expect(values == ["refresh": .int(5), "showLabel": .bool(true)])
     }
 
-    @Test("values(for:) returns nil for unknown widget ID")
-    @MainActor func valuesForUnknownID() {
+    @Test
+    @MainActor
+    func `values(for:) returns nil for unknown widget ID`() {
         resetRegistry()
         let registry = WidgetConfigRegistry.shared
         registry.setLoadedConfig(["cpu": ["refresh": .int(5)]])
@@ -51,8 +53,9 @@ struct WidgetConfigRegistryTests {
         #expect(registry.values(for: "weather") == nil)
     }
 
-    @Test("register tracks provider by configID")
-    @MainActor func registerProvider() {
+    @Test
+    @MainActor
+    func `register tracks provider by configID`() {
         resetRegistry()
         let registry = WidgetConfigRegistry.shared
         let provider = MockConfigProvider(configID: "battery")
@@ -65,8 +68,9 @@ struct WidgetConfigRegistryTests {
         #expect(provider.appliedConfig == ["threshold": .int(20)])
     }
 
-    @Test("applyToAll applies config only to providers with matching loaded config")
-    @MainActor func applyToAllWithMatchingConfig() {
+    @Test
+    @MainActor
+    func `applyToAll applies config only to providers with matching loaded config`() {
         resetRegistry()
         let registry = WidgetConfigRegistry.shared
         let cpuProvider = MockConfigProvider(configID: "cpu")
@@ -82,8 +86,9 @@ struct WidgetConfigRegistryTests {
         #expect(weatherProvider.appliedConfig == nil)
     }
 
-    @Test("applyToAll does nothing for providers without loaded config")
-    @MainActor func applyToAllWithoutConfig() {
+    @Test
+    @MainActor
+    func `applyToAll does nothing for providers without loaded config`() {
         resetRegistry()
         let registry = WidgetConfigRegistry.shared
         let provider = MockConfigProvider(configID: "memory")
@@ -95,8 +100,9 @@ struct WidgetConfigRegistryTests {
         #expect(provider.appliedConfig == nil)
     }
 
-    @Test("exportAll merges loaded config and live provider exports")
-    @MainActor func exportAllMerges() {
+    @Test
+    @MainActor
+    func `exportAll merges loaded config and live provider exports`() {
         resetRegistry()
         let registry = WidgetConfigRegistry.shared
 
@@ -119,8 +125,9 @@ struct WidgetConfigRegistryTests {
         #expect(exported["cpu"] == ["interval": .int(3)])
     }
 
-    @Test("notifySettingsChanged fires the onSettingsChanged callback")
-    @MainActor func notifySettingsChanged() {
+    @Test
+    @MainActor
+    func `notifySettingsChanged fires the onSettingsChanged callback`() {
         resetRegistry()
         let registry = WidgetConfigRegistry.shared
         var callCount = 0

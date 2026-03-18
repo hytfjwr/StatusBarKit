@@ -54,5 +54,6 @@
 --disable blankLinesAtEndOfScope
 --disable markTypes
 --disable environmentEntry
+--disable modifierOrder
 --disable sortSwitchCases
 --disable wrapSwitchCases

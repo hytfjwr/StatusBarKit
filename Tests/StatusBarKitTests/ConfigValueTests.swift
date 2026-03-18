@@ -1,13 +1,13 @@
 import Foundation
-import Testing
 @testable import StatusBarKit
+import Testing
 
-@Suite("ConfigValue")
 struct ConfigValueTests {
+
     // MARK: - Convenience Accessors
 
-    @Test("String value accessor")
-    func stringAccessor() {
+    @Test
+    func `String value accessor`() {
         let v = ConfigValue.string("hello")
         #expect(v.stringValue == "hello")
         #expect(v.boolValue == nil)
@@ -15,63 +15,63 @@ struct ConfigValueTests {
         #expect(v.doubleValue == nil)
     }
 
-    @Test("Bool value accessor")
-    func boolAccessor() {
+    @Test
+    func `Bool value accessor`() {
         let v = ConfigValue.bool(true)
         #expect(v.boolValue == true)
         #expect(v.stringValue == nil)
         #expect(v.intValue == nil)
     }
 
-    @Test("Int value accessor")
-    func intAccessor() {
+    @Test
+    func `Int value accessor`() {
         let v = ConfigValue.int(42)
         #expect(v.intValue == 42)
         #expect(v.stringValue == nil)
         #expect(v.boolValue == nil)
     }
 
-    @Test("Double value accessor")
-    func doubleAccessor() {
+    @Test
+    func `Double value accessor`() {
         let v = ConfigValue.double(3.14)
         #expect(v.doubleValue == 3.14)
         #expect(v.stringValue == nil)
     }
 
-    @Test("Int coerces to Double")
-    func intCoercesToDouble() {
+    @Test
+    func `Int coerces to Double`() {
         let v = ConfigValue.int(10)
         #expect(v.doubleValue == 10.0)
     }
 
     // MARK: - Codable Round-Trip
 
-    @Test("Encodes and decodes string")
-    func roundTripString() throws {
+    @Test
+    func `Encodes and decodes string`() throws {
         let original = ConfigValue.string("test")
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(ConfigValue.self, from: data)
         #expect(decoded == original)
     }
 
-    @Test("Encodes and decodes bool")
-    func roundTripBool() throws {
+    @Test
+    func `Encodes and decodes bool`() throws {
         let original = ConfigValue.bool(false)
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(ConfigValue.self, from: data)
         #expect(decoded == original)
     }
 
-    @Test("Encodes and decodes int")
-    func roundTripInt() throws {
+    @Test
+    func `Encodes and decodes int`() throws {
         let original = ConfigValue.int(99)
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(ConfigValue.self, from: data)
         #expect(decoded == original)
     }
 
-    @Test("Encodes and decodes double")
-    func roundTripDouble() throws {
+    @Test
+    func `Encodes and decodes double`() throws {
         let original = ConfigValue.double(2.718)
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(ConfigValue.self, from: data)
@@ -80,38 +80,38 @@ struct ConfigValueTests {
 
     // MARK: - Equatable
 
-    @Test("Equal values match")
-    func equalValues() {
+    @Test
+    func `Equal values match`() {
         #expect(ConfigValue.string("a") == ConfigValue.string("a"))
         #expect(ConfigValue.bool(true) == ConfigValue.bool(true))
         #expect(ConfigValue.int(1) == ConfigValue.int(1))
         #expect(ConfigValue.double(1.0) == ConfigValue.double(1.0))
     }
 
-    @Test("Different cases are not equal")
-    func differentCases() {
+    @Test
+    func `Different cases are not equal`() {
         #expect(ConfigValue.string("1") != ConfigValue.int(1))
         #expect(ConfigValue.int(1) != ConfigValue.double(1.0))
     }
 
     // MARK: - Decode Priority
 
-    @Test("Bool is decoded before Int (JSON true)")
-    func boolDecodedBeforeInt() throws {
+    @Test
+    func `Bool is decoded before Int (JSON true)`() throws {
         let json = Data("true".utf8)
         let decoded = try JSONDecoder().decode(ConfigValue.self, from: json)
         #expect(decoded == .bool(true))
     }
 
-    @Test("Int is decoded before Double (JSON integer)")
-    func intDecodedBeforeDouble() throws {
+    @Test
+    func `Int is decoded before Double (JSON integer)`() throws {
         let json = Data("42".utf8)
         let decoded = try JSONDecoder().decode(ConfigValue.self, from: json)
         #expect(decoded == .int(42))
     }
 
-    @Test("Fractional number is decoded as Double")
-    func fractionalAsDouble() throws {
+    @Test
+    func `Fractional number is decoded as Double`() throws {
         let json = Data("3.14".utf8)
         let decoded = try JSONDecoder().decode(ConfigValue.self, from: json)
         #expect(decoded == .double(3.14))

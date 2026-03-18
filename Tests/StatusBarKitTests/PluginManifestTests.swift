@@ -1,22 +1,21 @@
-import Testing
 @testable import StatusBarKit
+import Testing
 
-@Suite("PluginManifest")
 struct PluginManifestTests {
-    @Test("Default version is 1.0.0")
-    func defaultVersion() {
+    @Test
+    func `Default version is 1.0.0`() {
         let manifest = PluginManifest(id: "com.example.test", name: "Test")
         #expect(manifest.version == "1.0.0")
     }
 
-    @Test("Custom version")
-    func customVersion() {
+    @Test
+    func `Custom version`() {
         let manifest = PluginManifest(id: "com.example.test", name: "Test", version: "2.3.1")
         #expect(manifest.version == "2.3.1")
     }
 
-    @Test("Stores id and name")
-    func storesFields() {
+    @Test
+    func `Stores id and name`() {
         let manifest = PluginManifest(id: "com.example.weather", name: "Weather")
         #expect(manifest.id == "com.example.weather")
         #expect(manifest.name == "Weather")

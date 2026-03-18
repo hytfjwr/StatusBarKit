@@ -1,8 +1,8 @@
+@testable import StatusBarKit
 import SwiftUI
 import Testing
-@testable import StatusBarKit
 
-// MARK: - Mocks
+// MARK: - MinimalWidget
 
 @MainActor
 private final class MinimalWidget: StatusBarWidget {
@@ -18,11 +18,21 @@ private final class MinimalWidget: StatusBarWidget {
         self.updateInterval = updateInterval
     }
 
-    func start() { started = true }
-    func stop() { stopped = true }
-    func body() -> some View { Text("body") }
+    func start() {
+        started = true
+    }
+
+    func stop() {
+        stopped = true
+    }
+
+    func body() -> some View {
+        Text("body")
+    }
     // Uses default EmptyView settingsBody and default sfSymbolName
 }
+
+// MARK: - WidgetWithSettings
 
 @MainActor
 private final class WidgetWithSettings: StatusBarWidget {
@@ -33,16 +43,21 @@ private final class WidgetWithSettings: StatusBarWidget {
 
     func start() {}
     func stop() {}
-    func body() -> some View { Text("body") }
-    func settingsBody() -> some View { Text("settings") }
+    func body() -> some View {
+        Text("body")
+    }
+
+    func settingsBody() -> some View {
+        Text("settings")
+    }
 }
 
-// MARK: - Tests
+// MARK: - AnyStatusBarWidgetTests
 
-@Suite("AnyStatusBarWidget")
 struct AnyStatusBarWidgetTests {
-    @Test("Properties are forwarded from wrapped widget")
-    @MainActor func propertyForwarding() {
+    @Test
+    @MainActor
+    func `Properties are forwarded from wrapped widget`() {
         let widget = MinimalWidget(id: "cpu", position: .center, updateInterval: 5.0)
         let erased = AnyStatusBarWidget(widget)
 
@@ -51,24 +66,27 @@ struct AnyStatusBarWidgetTests {
         #expect(erased.updateInterval == 5.0)
     }
 
-    @Test("hasSettings is false when SettingsBody is EmptyView")
-    @MainActor func hasSettingsFalse() {
+    @Test
+    @MainActor
+    func `hasSettings is false when SettingsBody is EmptyView`() {
         let widget = MinimalWidget()
         let erased = AnyStatusBarWidget(widget)
 
         #expect(erased.hasSettings == false)
     }
 
-    @Test("hasSettings is true when SettingsBody is custom view")
-    @MainActor func hasSettingsTrue() {
+    @Test
+    @MainActor
+    func `hasSettings is true when SettingsBody is custom view`() {
         let widget = WidgetWithSettings()
         let erased = AnyStatusBarWidget(widget)
 
         #expect(erased.hasSettings == true)
     }
 
-    @Test("start() is forwarded to wrapped widget")
-    @MainActor func startForwarded() {
+    @Test
+    @MainActor
+    func `start() is forwarded to wrapped widget`() {
         let widget = MinimalWidget()
         let erased = AnyStatusBarWidget(widget)
 
@@ -77,8 +95,9 @@ struct AnyStatusBarWidgetTests {
         #expect(widget.started == true)
     }
 
-    @Test("stop() is forwarded to wrapped widget")
-    @MainActor func stopForwarded() {
+    @Test
+    @MainActor
+    func `stop() is forwarded to wrapped widget`() {
         let widget = MinimalWidget()
         let erased = AnyStatusBarWidget(widget)
 
@@ -87,16 +106,18 @@ struct AnyStatusBarWidgetTests {
         #expect(widget.stopped == true)
     }
 
-    @Test("Default sfSymbolName is forwarded")
-    @MainActor func defaultSFSymbol() {
+    @Test
+    @MainActor
+    func `Default sfSymbolName is forwarded`() {
         let widget = MinimalWidget()
         let erased = AnyStatusBarWidget(widget)
 
         #expect(erased.sfSymbolName == "square.dashed")
     }
 
-    @Test("Custom sfSymbolName is forwarded")
-    @MainActor func customSFSymbol() {
+    @Test
+    @MainActor
+    func `Custom sfSymbolName is forwarded`() {
         let widget = WidgetWithSettings()
         let erased = AnyStatusBarWidget(widget)
 
