@@ -2,7 +2,8 @@ import SwiftUI
 
 // MARK: - WidgetPosition
 
-@frozen public enum WidgetPosition: String, Codable, CaseIterable, Sendable {
+@frozen
+public enum WidgetPosition: String, Codable, CaseIterable, Sendable {
     case left
     case center
     case right
@@ -27,17 +28,23 @@ public protocol StatusBarWidget: AnyObject {
     /// Called when the widget is deactivated. Use this to cancel timers and release resources.
     func stop()
     /// The widget's main view rendered in the status bar.
-    @ViewBuilder func body() -> WidgetBody
+    @ViewBuilder
+    func body() -> WidgetBody
     /// Optional settings view shown when the user clicks the gear icon in preferences.
-    @ViewBuilder func settingsBody() -> SettingsBody
+    @ViewBuilder
+    func settingsBody() -> SettingsBody
 }
 
-extension StatusBarWidget {
-    public var sfSymbolName: String { "square.dashed" }
+public extension StatusBarWidget {
+    var sfSymbolName: String {
+        "square.dashed"
+    }
 }
 
-extension StatusBarWidget where SettingsBody == EmptyView {
-    public func settingsBody() -> EmptyView { EmptyView() }
+public extension StatusBarWidget where SettingsBody == EmptyView {
+    func settingsBody() -> EmptyView {
+        EmptyView()
+    }
 }
 
 // MARK: - AnyStatusBarWidget
@@ -58,23 +65,34 @@ public struct AnyStatusBarWidget: Identifiable {
     private let _settingsBody: @MainActor () -> AnyView
 
     public init<W: StatusBarWidget>(_ widget: W) {
-        self.id = widget.id
-        self.position = widget.position
-        self.updateInterval = widget.updateInterval
-        self.sfSymbolName = widget.sfSymbolName
-        self.hasSettings = W.SettingsBody.self != EmptyView.self
-        self._start = { widget.start() }
-        self._stop = { widget.stop() }
-        self._body = { AnyView(widget.body()) }
-        self._settingsBody = { AnyView(widget.settingsBody()) }
+        id = widget.id
+        position = widget.position
+        updateInterval = widget.updateInterval
+        sfSymbolName = widget.sfSymbolName
+        hasSettings = W.SettingsBody.self != EmptyView.self
+        _start = { widget.start() }
+        _stop = { widget.stop() }
+        _body = { AnyView(widget.body()) }
+        _settingsBody = { AnyView(widget.settingsBody()) }
     }
 
     /// Forward `start()` to the wrapped widget.
-    public func start() { _start() }
+    public func start() {
+        _start()
+    }
+
     /// Forward `stop()` to the wrapped widget.
-    public func stop() { _stop() }
+    public func stop() {
+        _stop()
+    }
+
     /// Return the widget's body as a type-erased `AnyView`.
-    public func body() -> AnyView { _body() }
+    public func body() -> AnyView {
+        _body()
+    }
+
     /// Return the widget's settings view as a type-erased `AnyView`.
-    public func settingsBody() -> AnyView { _settingsBody() }
+    public func settingsBody() -> AnyView {
+        _settingsBody()
+    }
 }
