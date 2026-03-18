@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - StatusBarPlugin
+
 /// Protocol that all plugins must conform to.
 /// Each plugin bundles one or more widgets and their backing services.
 @MainActor
@@ -15,8 +17,8 @@ public protocol StatusBarPlugin {
     func register(to registry: any WidgetRegistryProtocol)
 }
 
-extension StatusBarPlugin {
-    public func register(to registry: any WidgetRegistryProtocol) {
+public extension StatusBarPlugin {
+    func register(to registry: any WidgetRegistryProtocol) {
         for widget in widgets {
             registry.register(widget)
         }

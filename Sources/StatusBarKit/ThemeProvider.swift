@@ -34,7 +34,7 @@ public protocol ThemeProvider: AnyObject {
     var barTintHex: UInt32 { get }
     var barTintOpacity: Double { get }
 
-    // Shadow
+    /// Shadow
     var shadowEnabled: Bool { get }
 
     // Popup

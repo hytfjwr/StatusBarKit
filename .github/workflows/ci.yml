@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  SWIFTLINT_VERSION: '0.63.2'
+  SWIFTFORMAT_VERSION: '0.60.1'
+
+jobs:
+  build-and-test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26'
+
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
+
+  lint:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SwiftLint
+        run: |
+          curl -sLo /tmp/swiftlint.zip "https://github.com/realm/SwiftLint/releases/download/$SWIFTLINT_VERSION/portable_swiftlint.zip"
+          unzip -o /tmp/swiftlint.zip -d /tmp/swiftlint
+          sudo cp /tmp/swiftlint/swiftlint /usr/local/bin/
+          swiftlint version
+
+      - name: Lint
+        run: swiftlint lint --strict
+
+  format-check:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SwiftFormat
+        run: |
+          curl -sLo /tmp/swiftformat.zip "https://github.com/nicklockwood/SwiftFormat/releases/download/$SWIFTFORMAT_VERSION/swiftformat.artifactbundle.zip"
+          unzip -o /tmp/swiftformat.zip -d /tmp/swiftformat
+          BINARY=$(find /tmp/swiftformat -name swiftformat -type f -perm +111 | grep macos | head -1)
+          sudo cp "$BINARY" /usr/local/bin/swiftformat
+          swiftformat --version
+
+      - name: Check formatting
+        run: swiftformat --lint .

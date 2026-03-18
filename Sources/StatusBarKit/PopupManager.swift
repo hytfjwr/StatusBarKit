@@ -15,6 +15,8 @@ public final class PopupManager {
     }
 
     public func didHide(_ popup: PopupPanel) {
-        if activePopup === popup { activePopup = nil }
+        if activePopup === popup {
+            activePopup = nil
+        }
     }
 }

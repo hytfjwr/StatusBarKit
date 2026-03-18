@@ -19,7 +19,9 @@ public enum GlassEffect {
             .forEach { $0.removeFromSuperview() }
 
         let opacity = Theme.barTintOpacity
-        guard opacity > 0 else { return }
+        guard opacity > 0 else {
+            return
+        }
 
         let hex = Theme.barTintHex
         let r = CGFloat((hex >> 16) & 0xFF) / 255.0
@@ -31,7 +33,7 @@ public enum GlassEffect {
         tintView.autoresizingMask = [.width, .height]
         tintView.wantsLayer = true
         tintView.layer?.backgroundColor = NSColor(
-            srgbRed: r, green: g, blue: b, alpha: CGFloat(opacity)
+            srgbRed: r, green: g, blue: b, alpha: CGFloat(opacity),
         ).cgColor
         tintView.layer?.cornerRadius = glassView.cornerRadius as CGFloat
 

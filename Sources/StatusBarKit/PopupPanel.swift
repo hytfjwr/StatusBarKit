@@ -24,7 +24,7 @@ public final class PopupPanel: NSPanel {
             contentRect: contentRect,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
-            defer: true
+            defer: true,
         )
 
         level = .statusBar + 1
@@ -45,7 +45,9 @@ public final class PopupPanel: NSPanel {
         // Prevent reopening if the popup was just closed by a click monitor.
         // This avoids the race where the monitor's hidePopup() fires before
         // SwiftUI's onTapGesture, causing the popup to immediately reopen.
-        if wasRecentlyHidden { return }
+        if wasRecentlyHidden {
+            return
+        }
 
         lastTriggerFrame = triggerFrame
         lastScreen = screen
@@ -72,7 +74,7 @@ public final class PopupPanel: NSPanel {
 
         let glassView = GlassEffect.makeView(
             frame: .zero,
-            cornerRadius: Theme.popupCornerRadius
+            cornerRadius: Theme.popupCornerRadius,
         )
 
         hostingView.translatesAutoresizingMaskIntoConstraints = false
@@ -99,7 +101,9 @@ public final class PopupPanel: NSPanel {
     }
 
     private func repositionPopup(relativeTo triggerFrame: NSRect, on screen: NSScreen) {
-        guard let hostingView = currentHostingView else { return }
+        guard let hostingView = currentHostingView else {
+            return
+        }
         let fittingSize = hostingView.fittingSize
 
         // triggerFrame is already in screen coordinates.
@@ -132,7 +136,9 @@ public final class PopupPanel: NSPanel {
     /// Resize the popup to fit its current content. Call after content changes
     /// that affect the popup's size (e.g. accordion expand/collapse).
     public func resizeToFitContent() {
-        guard let triggerFrame = lastTriggerFrame, let screen = lastScreen else { return }
+        guard let triggerFrame = lastTriggerFrame, let screen = lastScreen else {
+            return
+        }
         repositionPopup(relativeTo: triggerFrame, on: screen)
     }
 
@@ -196,13 +202,15 @@ public final class PopupPanel: NSPanel {
     /// popups always appear under the clicked widget regardless of layout order.
     public static func barTriggerFrame(width: CGFloat = 40) -> (frame: NSRect, screen: NSScreen)? {
         let mouseLocation = NSEvent.mouseLocation
-        guard let screen = screenForMouseLocation() else { return nil }
+        guard let screen = screenForMouseLocation() else {
+            return nil
+        }
 
         let barFrame = NSRect(
             x: mouseLocation.x - width / 2,
             y: screen.frame.maxY - Theme.barHeight - Theme.barYOffset,
             width: width,
-            height: Theme.barHeight
+            height: Theme.barHeight,
         )
         return (barFrame, screen)
     }
