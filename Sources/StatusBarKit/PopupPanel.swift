@@ -18,6 +18,7 @@ public final class PopupPanel: NSPanel {
         Date().timeIntervalSince(lastHideTime) < 0.3
     }
 
+    /// Creates a new popup panel with the given initial content rect.
     public init(contentRect: NSRect) {
         super.init(
             contentRect: contentRect,
@@ -38,6 +39,8 @@ public final class PopupPanel: NSPanel {
         acceptsMouseMovedEvents = true
     }
 
+    /// Show the popup below the given trigger frame on the specified screen.
+    /// If the popup was hidden within the last 300ms, this call is ignored to prevent click-reopen races.
     public func showPopup(relativeTo triggerFrame: NSRect, on screen: NSScreen, content: some View) {
         // Prevent reopening if the popup was just closed by a click monitor.
         // This avoids the race where the monitor's hidePopup() fires before
@@ -133,6 +136,7 @@ public final class PopupPanel: NSPanel {
         repositionPopup(relativeTo: triggerFrame, on: screen)
     }
 
+    /// Hide the popup and clean up click monitors.
     public func hidePopup() {
         lastHideTime = Date()
         orderOut(nil)

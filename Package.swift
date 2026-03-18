@@ -19,5 +19,9 @@ let package = Package(
                 .unsafeFlags(["-Xlinker", "-install_name", "-Xlinker", "@rpath/libStatusBarKit.dylib"]),
             ]
         ),
+        .testTarget(
+            name: "StatusBarKitTests",
+            dependencies: ["StatusBarKit"]
+        ),
     ]
 )

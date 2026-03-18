@@ -14,13 +14,19 @@ import SwiftUI
 public protocol StatusBarWidget: AnyObject {
     associatedtype WidgetBody: View
     associatedtype SettingsBody: View = EmptyView
+    /// Unique identifier for this widget (e.g. "cpu", "weather").
     var id: String { get }
+    /// The bar section where this widget appears.
     var position: WidgetPosition { get }
+    /// Polling interval in seconds. Return `nil` to disable automatic refresh.
     var updateInterval: TimeInterval? { get }
     /// SF Symbol name used in the preferences widget list.
     var sfSymbolName: String { get }
+    /// Called when the widget becomes active. Use this to start timers or subscriptions.
     func start()
+    /// Called when the widget is deactivated. Use this to cancel timers and release resources.
     func stop()
+    /// The widget's main view rendered in the status bar.
     @ViewBuilder func body() -> WidgetBody
     /// Optional settings view shown when the user clicks the gear icon in preferences.
     @ViewBuilder func settingsBody() -> SettingsBody
@@ -63,8 +69,12 @@ public struct AnyStatusBarWidget: Identifiable {
         self._settingsBody = { AnyView(widget.settingsBody()) }
     }
 
+    /// Forward `start()` to the wrapped widget.
     public func start() { _start() }
+    /// Forward `stop()` to the wrapped widget.
     public func stop() { _stop() }
+    /// Return the widget's body as a type-erased `AnyView`.
     public func body() -> AnyView { _body() }
+    /// Return the widget's settings view as a type-erased `AnyView`.
     public func settingsBody() -> AnyView { _settingsBody() }
 }

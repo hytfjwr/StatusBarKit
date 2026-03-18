@@ -7,6 +7,7 @@ public final class GraphDataBuffer {
     private let capacity: Int
     private var count: Int = 0
 
+    /// Creates a new buffer with the given capacity. Defaults to 50 data points.
     public init(capacity: Int = 50) {
         self.capacity = capacity
         buffer = Array(repeating: 0, count: capacity)
@@ -15,6 +16,7 @@ public final class GraphDataBuffer {
     // swiftlint:disable:next empty_count
     public var isEmpty: Bool { count == 0 }
 
+    /// Append a value to the buffer. Overwrites the oldest entry when full.
     public func push(_ value: Double) {
         buffer[index] = value
         index = (index + 1) % capacity
@@ -23,6 +25,7 @@ public final class GraphDataBuffer {
         }
     }
 
+    /// Returns all buffered values in chronological order (oldest first).
     public func values() -> [Double] {
         guard !isEmpty else {
             return []

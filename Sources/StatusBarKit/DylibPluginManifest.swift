@@ -75,6 +75,7 @@ public struct SemanticVersion: Sendable, Comparable {
         self.patch = parts.count >= 3 ? parts[2] : 0
     }
 
+    /// Creates a semantic version from individual components.
     public init(major: Int, minor: Int, patch: Int) {
         self.major = major
         self.minor = minor

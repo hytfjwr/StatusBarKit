@@ -1,6 +1,8 @@
 import Foundation
 
+/// Errors thrown by ``ShellCommand``.
 public enum ShellCommandError: Error {
+    /// The process did not finish within the specified timeout interval.
     case timeout
 }
 
