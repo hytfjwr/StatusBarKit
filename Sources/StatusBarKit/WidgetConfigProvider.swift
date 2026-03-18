@@ -125,4 +125,12 @@ public final class WidgetConfigRegistry {
     public func notifySettingsChanged() {
         onSettingsChanged?()
     }
+
+    /// Reset all state. Intended for testing only.
+    @_spi(Testing)
+    public func reset() {
+        loadedConfig = [:]
+        providers = [:]
+        onSettingsChanged = nil
+    }
 }
