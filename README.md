@@ -83,20 +83,15 @@ public func createStatusBarPlugin() -> UnsafeMutableRawPointer {
 }
 ```
 
-### 4. Add a Plugin Manifest
+### 4. Build the Plugin
 
-Create a `manifest.json` in your plugin bundle:
+The easiest way to get started is to clone the [plugin template](https://github.com/hytfjwr/statusbar-plugin-template) and build with `make`:
 
-```json
-{
-    "id": "com.example.hello",
-    "name": "Hello",
-    "version": "1.0.0",
-    "statusBarKitVersion": "1.0.0",
-    "swiftVersion": "6.2",
-    "entrySymbol": "createStatusBarPlugin"
-}
+```bash
+make build
 ```
+
+This builds the dylib and auto-generates the required `manifest.json` for host discovery. See the template repository for the full project structure and build configuration.
 
 ## Architecture
 
@@ -112,11 +107,11 @@ StatusBarKit
 
 ### Plugin Loading Flow
 
-1. Host reads `DylibPluginManifest` (JSON) from the plugin bundle
-2. Resolves the C entry symbol via `dlsym` (default: `"createStatusBarPlugin"`)
+1. Host discovers plugin bundles and reads the auto-generated `manifest.json` (`DylibPluginManifest`)
+2. Verifies version compatibility (semver) and resolves the C entry symbol via `dlsym`
 3. Entry function returns a `PluginBox` wrapping a `@MainActor` factory closure
-4. Host calls `box.factory()` on the main actor to instantiate the plugin
-5. Plugin registers its widgets via `register(to: WidgetRegistryProtocol)`
+4. Host calls `box.factory()` on the main actor to instantiate the `StatusBarPlugin`
+5. Plugin's `register(to:)` is called — each widget is registered to the host's `WidgetRegistryProtocol`
 
 ### Version Compatibility
 
@@ -132,6 +127,7 @@ StatusBarKit uses semantic versioning for plugin compatibility:
 - [statusbar-plugin-spotify](https://github.com/hytfjwr/statusbar-plugin-spotify) - Spotify playback control
 - [statusbar-plugin-vpn](https://github.com/hytfjwr/statusbar-plugin-vpn) - VPN connection status
 - [statusbar-plugin-aerospace](https://github.com/hytfjwr/statusbar-plugin-aerospace) - AeroSpace window manager integration
+- [statusbar-plugin-claude](https://github.com/hytfjwr/statusbar-plugin-claude) - Claude Code status
 
 ## License
 
