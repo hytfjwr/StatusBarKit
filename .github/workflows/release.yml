@@ -1,4 +1,4 @@
-name: Release
+name: Release Prepare
 
 on:
   workflow_dispatch:
@@ -33,18 +33,13 @@ jobs:
       - name: Test
         run: swift test
 
-  release:
+  prepare:
     needs: test
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Select Xcode 26
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '26'
 
       - name: Calculate next version
         id: version
@@ -99,49 +94,38 @@ jobs:
           ' CHANGELOG.md > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
           rm -f /tmp/commits.txt
 
+      - name: Update StatusBarKitVersion.swift
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          sed -i '' "s/public let statusBarKitVersion = \".*\"/public let statusBarKitVersion = \"${VERSION}\"/" \
+            Sources/StatusBarKit/StatusBarKitVersion.swift
+
       - name: Commit version bump
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
+          git add CHANGELOG.md Sources/StatusBarKit/StatusBarKitVersion.swift
           git commit -m "chore: release ${TAG}"
 
-      - name: Build release binary
-        run: swift build -c release
+      - name: Push release branch
+        run: git push origin release/${{ steps.version.outputs.tag }}
 
-      - name: Package artifacts
-        run: make package
-
-      - name: Push branch and tag
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          BRANCH="release/${TAG}"
-          git tag "$TAG"
-          git push origin "$BRANCH" "$TAG"
-
-      - name: Create GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          PREV="${{ steps.version.outputs.previous_tag }}"
-          NOTES_FLAG="--generate-notes"
-          if [ "$PREV" != "v0.0.0" ]; then
-            NOTES_FLAG="--generate-notes --notes-start-tag ${PREV}"
-          fi
-          gh release create "$TAG" \
-            StatusBarKit.zip \
-            --title "$TAG" \
-            $NOTES_FLAG
-
-      - name: Create version bump PR
+      - name: Create release PR
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           gh pr create \
             --title "chore: release ${TAG}" \
-            --body "Update CHANGELOG for ${TAG}." \
+            --body "$(cat <<EOF
+          ## Release ${TAG}
+
+          - Update \`StatusBarKitVersion.swift\` to ${TAG#v}
+          - Update CHANGELOG
+
+          > Merging this PR will automatically tag and publish the release.
+          EOF
+          )" \
             --head "release/${TAG}" \
             --base main
