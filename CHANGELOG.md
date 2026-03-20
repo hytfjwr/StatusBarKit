@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-03-20
+
+- ci: add version check and split release workflow into two phases (#9)
+
 ## [1.1.0] - 2026-03-20
 
 - fix(ci): scope CHANGELOG and release notes to changes since last tag

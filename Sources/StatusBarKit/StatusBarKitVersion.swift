@@ -3,4 +3,4 @@
 /// - Major version change = breaking API change (plugins must be rebuilt)
 /// - Minor version change = additive API change (old plugins still work)
 /// - Patch version change = bug fix only (old plugins still work)
-public let statusBarKitVersion = "1.1.0"
+public let statusBarKitVersion = "1.1.1"
