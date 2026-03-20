@@ -23,6 +23,8 @@ public protocol StatusBarWidget: AnyObject {
     var updateInterval: TimeInterval? { get }
     /// SF Symbol name used in the preferences widget list.
     var sfSymbolName: String { get }
+    /// Preferred size for the settings sheet. Return `nil` to use the default (360 × 240).
+    var preferredSettingsSize: CGSize? { get }
     /// Called when the widget becomes active. Use this to start timers or subscriptions.
     func start()
     /// Called when the widget is deactivated. Use this to cancel timers and release resources.
@@ -38,6 +40,10 @@ public protocol StatusBarWidget: AnyObject {
 public extension StatusBarWidget {
     var sfSymbolName: String {
         "square.dashed"
+    }
+
+    var preferredSettingsSize: CGSize? {
+        nil
     }
 }
 
@@ -59,6 +65,7 @@ public struct AnyStatusBarWidget: Identifiable {
     public let updateInterval: TimeInterval?
     public let sfSymbolName: String
     public let hasSettings: Bool
+    public let preferredSettingsSize: CGSize?
     private let _start: @MainActor () -> Void
     private let _stop: @MainActor () -> Void
     private let _body: @MainActor () -> AnyView
@@ -70,6 +77,7 @@ public struct AnyStatusBarWidget: Identifiable {
         updateInterval = widget.updateInterval
         sfSymbolName = widget.sfSymbolName
         hasSettings = W.SettingsBody.self != EmptyView.self
+        preferredSettingsSize = widget.preferredSettingsSize
         _start = { widget.start() }
         _stop = { widget.stop() }
         _body = { AnyView(widget.body()) }
