@@ -62,7 +62,8 @@ jobs:
           VERSION="${MAJOR}.${MINOR}.${PATCH}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Releasing v${VERSION}"
+          echo "previous_tag=${LATEST}" >> "$GITHUB_OUTPUT"
+          echo "Releasing v${VERSION} (previous: ${LATEST})"
 
       - name: Create release branch
         run: git checkout -b release/${{ steps.version.outputs.tag }}
@@ -71,7 +72,32 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           DATE=$(date +%Y-%m-%d)
-          perl -pi -e "s/## \[Unreleased\]/## [Unreleased]\n\n## [${VERSION}] - ${DATE}/" CHANGELOG.md
+
+          # Collect commits since last tag into a temp file
+          LATEST_TAG="${{ steps.version.outputs.previous_tag }}"
+          if [ "$LATEST_TAG" != "v0.0.0" ]; then
+            git log "${LATEST_TAG}..HEAD" --pretty=format:"- %s" --no-merges | grep -v "^- chore: release " > /tmp/commits.txt || true
+          else
+            git log --pretty=format:"- %s" --no-merges | grep -v "^- chore: release " > /tmp/commits.txt || true
+          fi
+
+          # Insert version header and commits via awk (reads commits from file to avoid newline issues)
+          awk -v ver="$VERSION" -v date="$DATE" '
+            /^## \[Unreleased\]/ {
+              print "## [Unreleased]"
+              print ""
+              print "## [" ver "] - " date
+              if ((getline first < "/tmp/commits.txt") > 0) {
+                print ""
+                print first
+                while ((getline line < "/tmp/commits.txt") > 0) print line
+              }
+              close("/tmp/commits.txt")
+              next
+            }
+            { print }
+          ' CHANGELOG.md > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
+          rm -f /tmp/commits.txt
 
       - name: Commit version bump
         run: |
@@ -99,10 +125,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${{ steps.version.outputs.tag }}"
+          PREV="${{ steps.version.outputs.previous_tag }}"
+          NOTES_FLAG="--generate-notes"
+          if [ "$PREV" != "v0.0.0" ]; then
+            NOTES_FLAG="--generate-notes --notes-start-tag ${PREV}"
+          fi
           gh release create "$TAG" \
             StatusBarKit.zip \
             --title "$TAG" \
-            --generate-notes
+            $NOTES_FLAG
 
       - name: Create version bump PR
         env:
