@@ -41,6 +41,31 @@ jobs:
       - name: Lint
         run: swiftlint lint --strict
 
+  version-check:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check version consistency
+        run: |
+          LATEST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -1)
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No version tags found — skipping check"
+            exit 0
+          fi
+          TAG_VERSION="${LATEST_TAG#v}"
+          FILE_VERSION=$(sed -n 's/^public let statusBarKitVersion = "\(.*\)"/\1/p' \
+            Sources/StatusBarKit/StatusBarKitVersion.swift)
+          echo "Tag version:  ${TAG_VERSION}"
+          echo "File version: ${FILE_VERSION}"
+          if [ "$TAG_VERSION" != "$FILE_VERSION" ]; then
+            echo "::error::Version mismatch: latest tag is v${TAG_VERSION} but StatusBarKitVersion.swift has ${FILE_VERSION}"
+            exit 1
+          fi
+          echo "Versions match."
+
   format-check:
     runs-on: macos-26
     steps:
