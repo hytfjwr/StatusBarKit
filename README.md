@@ -2,9 +2,20 @@
 
 A macOS plugin SDK for building dynamic status bar widgets. StatusBarKit provides the foundation for creating extensible status bar applications with a plugin architecture, SwiftUI-based widgets, popup panels with glass effects, and a runtime theme system.
 
+## Products
+
+This package provides two library targets:
+
+| Library | Platform | Description |
+|---|---|---|
+| **StatusBarKit** | macOS 26+ | Full SDK — widgets, popups, themes, plugin system (dynamic library) |
+| **StatusBarIPC** | macOS 15+ | IPC protocol types for CLI communication (static library) |
+
+`StatusBarKit` re-exports `StatusBarIPC`, so existing code that `import StatusBarKit` gains access to IPC types automatically. CLI tools that only need wire types can depend on `StatusBarIPC` alone, without the macOS 26 requirement.
+
 ## Requirements
 
-- macOS 26+
+- macOS 15+ (StatusBarIPC) / macOS 26+ (StatusBarKit)
 - Swift 6.2+
 - Xcode 26+
 
@@ -16,17 +27,20 @@ Add StatusBarKit as a dependency in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/hytfjwr/StatusBarKit.git", from: "1.0.0"),
+    .package(url: "https://github.com/hytfjwr/StatusBarKit.git", from: "1.4.0"),
 ]
 ```
 
 Then add it to your target:
 
 ```swift
-.target(
-    name: "YourTarget",
-    dependencies: ["StatusBarKit"]
-)
+// For the full SDK (widgets, popups, plugins):
+.target(name: "YourApp", dependencies: ["StatusBarKit"])
+
+// For CLI tools that only need IPC types:
+.target(name: "YourCLI", dependencies: [
+    .product(name: "StatusBarIPC", package: "StatusBarKit"),
+])
 ```
 
 ## Quick Start
@@ -97,6 +111,7 @@ This builds the dylib and auto-generates the required `manifest.json` for host d
 
 ```
 StatusBarKit
+├── StatusBarIPC      – IPC protocol types, message framing, socket path constants
 ├── Plugin System     – dylib loading, manifests, semantic version compatibility
 ├── Widget System     – StatusBarWidget protocol, type-erased wrappers, layout persistence
 ├── Configuration     – YAML-based hot-reload config with WidgetConfigProvider
@@ -104,6 +119,17 @@ StatusBarKit
 ├── Theme System      – Runtime theme injection via ThemeProvider protocol
 └── Utilities         – ShellCommand, AppIconProvider, GraphDataBuffer
 ```
+
+### IPC Protocol (StatusBarIPC)
+
+StatusBarIPC defines the wire protocol for communication between the StatusBar app and the `sbar` CLI (bundled in [StatusBar](https://github.com/hytfjwr/StatusBar)):
+
+- **`IPCRequest` / `IPCResponse`** — versioned request/response envelopes
+- **`IPCCommand`** — supported commands: `list`, `getWidget`, `setWidget`, `setGlobal`, `reload`
+- **`IPCFraming`** — 4-byte length-prefixed message framing over Unix domain sockets
+- **`WidgetInfoDTO`** — serializable widget info for transfer between processes
+
+Shared Foundation-only types (`ConfigValue`, `WidgetPosition`, `WidgetLayoutEntry`) live in StatusBarIPC so they can be used by both the full SDK and lightweight CLI tools.
 
 ### Plugin Loading Flow
 
