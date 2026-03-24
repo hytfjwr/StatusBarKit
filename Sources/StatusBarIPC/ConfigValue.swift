@@ -1,6 +1,8 @@
 import Foundation
 
 /// A type-erased value for widget configuration. Encodes/decodes as a raw YAML scalar.
+@available(macOS 15, *)
+@_originallyDefinedIn(module: "StatusBarKit", macOS 15)
 public enum ConfigValue: Codable, Sendable, Equatable {
     case string(String)
     case bool(Bool)

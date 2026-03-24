@@ -1,6 +1,8 @@
 import Foundation
 
 /// Persisted layout state for a single widget.
+@available(macOS 15, *)
+@_originallyDefinedIn(module: "StatusBarKit", macOS 15)
 public struct WidgetLayoutEntry: Codable, Sendable, Identifiable, Equatable {
     public let id: String
     public var section: WidgetPosition
