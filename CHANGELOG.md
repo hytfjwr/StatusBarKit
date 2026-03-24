@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-03-24
+
+- fix: preserve ABI compatibility for types moved to StatusBarIPC (#19)
+
 ## [1.4.0] - 2026-03-24
 
 - feat: add StatusBarIPC target for CLI communication (#16)
