@@ -3,7 +3,7 @@ import Foundation
 // MARK: - ShellCommandError
 
 /// Errors thrown by ``ShellCommand``.
-public enum ShellCommandError: LocalizedError {
+public enum ShellCommandError: LocalizedError, Equatable {
     /// The process did not finish within the specified timeout interval.
     case timeout
 
@@ -21,7 +21,7 @@ public enum ShellCommandError: LocalizedError {
 // MARK: - ShellCommandResult
 
 /// The complete result of a shell command execution.
-public struct ShellCommandResult: Sendable {
+public struct ShellCommandResult: Sendable, Equatable {
     /// Standard output (trimmed).
     public let stdout: String
     /// Standard error (trimmed).
