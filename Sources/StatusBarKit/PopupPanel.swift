@@ -97,6 +97,7 @@ public final class PopupPanel: NSPanel {
         ])
 
         contentView = glassView
+        GlassEffect.applyTint(to: glassView)
         GlassEffect.applyShadow(to: self)
     }
 
@@ -140,6 +141,14 @@ public final class PopupPanel: NSPanel {
             return
         }
         repositionPopup(relativeTo: triggerFrame, on: screen)
+    }
+
+    /// Re-apply the tint overlay to match current preferences.
+    public func updateTint() {
+        guard let glassView = contentView as? NSGlassEffectView else {
+            return
+        }
+        GlassEffect.applyTint(to: glassView)
     }
 
     /// Hide the popup and clean up click monitors.

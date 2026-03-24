@@ -19,4 +19,9 @@ public final class PopupManager {
             activePopup = nil
         }
     }
+
+    /// Re-apply tint overlay on the active popup, if any.
+    public func updateTint() {
+        activePopup?.updateTint()
+    }
 }
