@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-03-24
+
+- fix: apply tint overlay to popup panels (#12)
+- docs: update README to reflect actual plugin development flow
+- fix(ci): skip version-check for release branches (#11)
+
 ## [1.1.1] - 2026-03-20
 
 - ci: add version check and split release workflow into two phases (#9)
