@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 
+@available(macOS 26, *)
 @MainActor
 public final class PopupPanel: NSPanel {
     private var globalMonitor: Any?

@@ -1,14 +1,5 @@
 import SwiftUI
 
-// MARK: - WidgetPosition
-
-@frozen
-public enum WidgetPosition: String, Codable, CaseIterable, Sendable {
-    case left
-    case center
-    case right
-}
-
 // MARK: - StatusBarWidget
 
 @MainActor
