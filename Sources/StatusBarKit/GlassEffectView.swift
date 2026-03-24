@@ -1,6 +1,7 @@
 import AppKit
 
 /// Native Liquid Glass effect using NSGlassEffectView (macOS 26+).
+@available(macOS 26, *)
 @MainActor
 public enum GlassEffect {
     /// Build a native Liquid Glass view for a given frame.

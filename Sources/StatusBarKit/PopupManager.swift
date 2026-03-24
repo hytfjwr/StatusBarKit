@@ -1,5 +1,6 @@
 import AppKit
 
+@available(macOS 26, *)
 @MainActor
 public final class PopupManager {
     public static let shared = PopupManager()
