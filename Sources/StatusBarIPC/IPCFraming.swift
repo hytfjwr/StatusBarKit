@@ -28,7 +28,10 @@ public enum IPCFraming {
         var offset = 0
         while offset < count {
             let bytesRead = buffer.withUnsafeMutableBytes { ptr in
-                read(fd, ptr.baseAddress!.advanced(by: offset), count - offset)
+                guard let base = ptr.baseAddress else {
+                    return -1
+                }
+                return read(fd, base.advanced(by: offset), count - offset)
             }
             if bytesRead <= 0 {
                 return nil
@@ -56,9 +59,12 @@ public enum IPCFraming {
     /// Write a length-prefixed frame to a file descriptor.
     public static func writeFrame(fd: Int32, data: Data) -> Bool {
         data.withUnsafeBytes { ptr in
+            guard let base = ptr.baseAddress else {
+                return false
+            }
             var offset = 0
             while offset < data.count {
-                let written = write(fd, ptr.baseAddress!.advanced(by: offset), data.count - offset)
+                let written = write(fd, base.advanced(by: offset), data.count - offset)
                 if written <= 0 {
                     return false
                 }
