@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-03-24
+
+- feat: add ShellCommandResult and runWithResult API (#14)
+
 ## [1.2.0] - 2026-03-24
 
 - fix: apply tint overlay to popup panels (#12)
