@@ -56,8 +56,8 @@ public enum IPCFraming {
         return try JSONDecoder().decode(type, from: body)
     }
 
-    /// Write a length-prefixed frame to a file descriptor.
-    public static func writeFrame(fd: Int32, data: Data) -> Bool {
+    /// Write raw bytes to a file descriptor, retrying partial writes.
+    public static func writeAll(fd: Int32, data: Data) -> Bool {
         data.withUnsafeBytes { ptr in
             guard let base = ptr.baseAddress else {
                 return false
@@ -72,6 +72,11 @@ public enum IPCFraming {
             }
             return true
         }
+    }
+
+    /// Write a length-prefixed frame to a file descriptor.
+    public static func writeFrame(fd: Int32, data: Data) -> Bool {
+        writeAll(fd: fd, data: data)
     }
 }
 

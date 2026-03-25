@@ -43,6 +43,8 @@ public enum IPCCommand: Codable, Sendable, Equatable {
     case setGlobal(keyPath: String, value: ConfigValue)
     /// Reload configuration from disk.
     case reload
+    /// Subscribe to named events. The connection stays open and receives NDJSON lines.
+    case subscribe(events: [BarEventName])
 }
 
 // MARK: - IPCResponse
@@ -78,6 +80,8 @@ public enum IPCPayload: Codable, Sendable, Equatable {
     case widgetDetail(WidgetInfoDTO)
     /// Response to `.setWidget`, `.setGlobal`, `.reload`.
     case ok
+    /// Acknowledgement for `.subscribe` — lists the events the server accepted.
+    case subscribeAck(events: [BarEventName])
 }
 
 // MARK: - IPCError
