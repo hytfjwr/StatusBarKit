@@ -43,14 +43,6 @@ public enum IPCCommand: Codable, Sendable, Equatable {
     case setGlobal(keyPath: String, value: ConfigValue)
     /// Reload configuration from disk.
     case reload
-    /// Subscribe to events. The server keeps the connection open and pushes events as they fire.
-    case subscribe(events: [String])
-    /// Trigger a custom event, broadcasting to all matching subscribers.
-    case trigger(event: String, env: [String: String])
-    /// Create a new script widget at runtime.
-    case addItem(id: String, position: WidgetPosition)
-    /// Remove a script widget.
-    case removeItem(id: String)
 }
 
 // MARK: - IPCResponse
@@ -86,8 +78,6 @@ public enum IPCPayload: Codable, Sendable, Equatable {
     case widgetDetail(WidgetInfoDTO)
     /// Response to `.setWidget`, `.setGlobal`, `.reload`.
     case ok
-    /// Event pushed to subscribe connections.
-    case event(IPCEvent)
 }
 
 // MARK: - IPCError
@@ -100,21 +90,4 @@ public enum IPCError: Codable, Sendable, Equatable, Error {
     case invalidValue(key: String, reason: String)
     case versionMismatch(serverVersion: Int, clientVersion: Int)
     case internalError(String)
-    case itemAlreadyExists(id: String)
-    case invalidProperty(String)
-}
-
-// MARK: - IPCEvent
-
-/// An event pushed to subscribe connections.
-public struct IPCEvent: Codable, Sendable, Equatable {
-    public let event: String
-    public let env: [String: String]
-    public let timestamp: Date
-
-    public init(event: String, env: [String: String] = [:], timestamp: Date = Date()) {
-        self.event = event
-        self.env = env
-        self.timestamp = timestamp
-    }
 }
