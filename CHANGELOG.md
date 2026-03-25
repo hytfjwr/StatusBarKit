@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-03-25
+
+- feat: add IPC event subscription protocol types (#21)
+- Revert "feat: add IPC commands for event system and script widgets"
+- feat: add IPC commands for event system and script widgets
+
 ## [1.4.1] - 2026-03-24
 
 - fix: preserve ABI compatibility for types moved to StatusBarIPC (#19)
