@@ -45,6 +45,8 @@ public enum IPCCommand: Codable, Sendable, Equatable {
     case reload
     /// Subscribe to named events. The connection stays open and receives NDJSON lines.
     case subscribe(events: [BarEventName])
+    /// Send a custom event to plugin widgets that subscribe to the given event name.
+    case trigger(event: String, payload: JSONValue?)
 }
 
 // MARK: - IPCResponse

@@ -49,6 +49,24 @@ struct IPCProtocolTests {
         #expect(decoded.command == .reload)
     }
 
+    @Test
+    func `trigger command round-trips through Codable`() throws {
+        let cmd = IPCCommand.trigger(event: "com.example.deploy", payload: .object(["repo": .string("main")]))
+        let request = IPCRequest(command: cmd)
+        let data = try JSONEncoder().encode(request)
+        let decoded = try JSONDecoder().decode(IPCRequest.self, from: data)
+        #expect(decoded.command == cmd)
+    }
+
+    @Test
+    func `trigger command with nil payload round-trips`() throws {
+        let cmd = IPCCommand.trigger(event: "com.example.ping", payload: nil)
+        let request = IPCRequest(command: cmd)
+        let data = try JSONEncoder().encode(request)
+        let decoded = try JSONDecoder().decode(IPCRequest.self, from: data)
+        #expect(decoded.command == cmd)
+    }
+
     // MARK: - IPCResponse round-trips
 
     @Test
