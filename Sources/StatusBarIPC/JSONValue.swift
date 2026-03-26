@@ -32,7 +32,7 @@ public enum JSONValue: Sendable, Codable, Equatable {
             self = .object(v)
         } else {
             throw DecodingError.dataCorruptedError(
-                in: container, debugDescription: "Unsupported JSON value type"
+                in: container, debugDescription: "Unsupported JSON value type",
             )
         }
     }

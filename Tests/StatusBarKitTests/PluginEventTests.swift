@@ -9,7 +9,7 @@ struct PluginEventTests {
         let event = PluginEvent(
             name: "com.example.myapp.deploy_finished",
             payload: .object(["repo": .string("main")]),
-            sourcePlugin: "com.example.other"
+            sourcePlugin: "com.example.other",
         )
         let data = try JSONEncoder().encode(event)
         let decoded = try JSONDecoder().decode(PluginEvent.self, from: data)

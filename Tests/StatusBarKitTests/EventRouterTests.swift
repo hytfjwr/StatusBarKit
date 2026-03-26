@@ -2,7 +2,7 @@
 import SwiftUI
 import Testing
 
-// MARK: - Test widget that records received events
+// MARK: - EventCapturingWidget
 
 @MainActor
 private final class EventCapturingWidget: StatusBarWidget {
@@ -19,7 +19,9 @@ private final class EventCapturingWidget: StatusBarWidget {
 
     func start() {}
     func stop() {}
-    func body() -> some View { Text("test") }
+    func body() -> some View {
+        Text("test")
+    }
 
     func handleEvent(_ event: PluginEvent) {
         receivedEvents.append(event)

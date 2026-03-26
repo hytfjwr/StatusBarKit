@@ -28,7 +28,9 @@ public final class EventRouter {
     public func registerWidgets(_ widgets: [AnyStatusBarWidget], pluginID: String) {
         unregisterPlugin(pluginID)
         for widget in widgets {
-            guard !widget.subscribedEvents.isEmpty else { continue }
+            guard !widget.subscribedEvents.isEmpty else {
+                continue
+            }
             for suffix in widget.subscribedEvents {
                 let fullyQualified = "\(pluginID).\(suffix)"
                 let isWildcard = fullyQualified.hasSuffix("*")
@@ -37,7 +39,7 @@ public final class EventRouter {
                     pluginID: pluginID,
                     matchPrefix: matchPrefix,
                     isWildcard: isWildcard,
-                    widget: widget
+                    widget: widget,
                 ))
             }
         }
