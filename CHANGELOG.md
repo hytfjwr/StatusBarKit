@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-03-26
+
+- feat: add trigger event system for plugin widgets (#23)
+
 ## [1.5.0] - 2026-03-25
 
 - feat: add IPC event subscription protocol types (#21)
