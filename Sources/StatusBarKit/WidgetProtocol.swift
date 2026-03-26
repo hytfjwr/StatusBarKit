@@ -26,6 +26,14 @@ public protocol StatusBarWidget: AnyObject {
     /// Optional settings view shown when the user clicks the gear icon in preferences.
     @ViewBuilder
     func settingsBody() -> SettingsBody
+
+    /// Event name suffixes this widget subscribes to.
+    /// The plugin's manifest ID is automatically prepended as a prefix.
+    /// Supports trailing wildcard `*` (e.g. `"deploy_*"`).
+    var subscribedEvents: [String] { get }
+
+    /// Called when a matching event is delivered.
+    func handleEvent(_ event: PluginEvent)
 }
 
 public extension StatusBarWidget {
@@ -36,6 +44,12 @@ public extension StatusBarWidget {
     var preferredSettingsSize: CGSize? {
         nil
     }
+
+    var subscribedEvents: [String] {
+        []
+    }
+
+    func handleEvent(_: PluginEvent) {}
 }
 
 public extension StatusBarWidget where SettingsBody == EmptyView {
@@ -57,10 +71,12 @@ public struct AnyStatusBarWidget: Identifiable {
     public let sfSymbolName: String
     public let hasSettings: Bool
     public let preferredSettingsSize: CGSize?
+    public let subscribedEvents: [String]
     private let _start: @MainActor () -> Void
     private let _stop: @MainActor () -> Void
     private let _body: @MainActor () -> AnyView
     private let _settingsBody: @MainActor () -> AnyView
+    private let _handleEvent: @MainActor (PluginEvent) -> Void
 
     public init<W: StatusBarWidget>(_ widget: W) {
         id = widget.id
@@ -69,10 +85,12 @@ public struct AnyStatusBarWidget: Identifiable {
         sfSymbolName = widget.sfSymbolName
         hasSettings = W.SettingsBody.self != EmptyView.self
         preferredSettingsSize = widget.preferredSettingsSize
+        subscribedEvents = widget.subscribedEvents
         _start = { widget.start() }
         _stop = { widget.stop() }
         _body = { AnyView(widget.body()) }
         _settingsBody = { AnyView(widget.settingsBody()) }
+        _handleEvent = { widget.handleEvent($0) }
     }
 
     /// Forward `start()` to the wrapped widget.
@@ -93,5 +111,10 @@ public struct AnyStatusBarWidget: Identifiable {
     /// Return the widget's settings view as a type-erased `AnyView`.
     public func settingsBody() -> AnyView {
         _settingsBody()
+    }
+
+    /// Forward event to the wrapped widget.
+    public func handleEvent(_ event: PluginEvent) {
+        _handleEvent(event)
     }
 }
