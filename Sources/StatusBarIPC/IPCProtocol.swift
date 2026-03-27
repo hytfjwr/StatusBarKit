@@ -44,7 +44,7 @@ public enum IPCCommand: Codable, Sendable, Equatable {
     /// Reload configuration from disk.
     case reload
     /// Subscribe to named events. The connection stays open and receives NDJSON lines.
-    case subscribe(events: [BarEventName])
+    case subscribe(events: [String])
     /// Send a custom event to plugin widgets that subscribe to the given event name.
     case trigger(event: String, payload: JSONValue?)
 }
@@ -83,7 +83,7 @@ public enum IPCPayload: Codable, Sendable, Equatable {
     /// Response to `.setWidget`, `.setGlobal`, `.reload`.
     case ok
     /// Acknowledgement for `.subscribe` — lists the events the server accepted.
-    case subscribeAck(events: [BarEventName])
+    case subscribeAck(events: [String])
 }
 
 // MARK: - IPCError
