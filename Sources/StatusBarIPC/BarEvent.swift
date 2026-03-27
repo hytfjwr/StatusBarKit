@@ -1,22 +1,12 @@
 import Foundation
 
-// MARK: - BarEventName
+// MARK: - BarEvent
 
-/// Canonical event names for the subscribe system.
-/// New events require a minor version bump to StatusBarKit.
-public enum BarEventName: String, Codable, Sendable, CaseIterable {
-    case frontAppSwitched = "front_app_switched"
-    case volumeChanged = "volume_changed"
-    case configReloaded = "config_reloaded"
-}
-
-// MARK: - BarEventPayload
-
-/// Per-event payload carried inside an `IPCEventEnvelope`.
-public enum BarEventPayload: Codable, Sendable, Equatable {
-    case frontAppSwitched(appName: String, bundleID: String?)
-    case volumeChanged(volume: Int, muted: Bool)
-    case configReloaded
+/// Well-known event names provided by StatusBarKit.
+/// Host applications may define additional event names as plain strings.
+public enum BarEvent {
+    /// Emitted when configuration is reloaded from disk.
+    public static let configReloaded = "config_reloaded"
 }
 
 // MARK: - IPCEventEnvelope
@@ -24,11 +14,11 @@ public enum BarEventPayload: Codable, Sendable, Equatable {
 /// A single event pushed to subscribers as newline-delimited JSON (NDJSON).
 /// Sent after the initial `subscribeAck` handshake, without length-prefix framing.
 public struct IPCEventEnvelope: Codable, Sendable, Equatable {
-    public let event: BarEventName
+    public let event: String
     public let timestamp: Double
-    public let payload: BarEventPayload
+    public let payload: JSONValue?
 
-    public init(event: BarEventName, timestamp: Double = Date().timeIntervalSince1970, payload: BarEventPayload) {
+    public init(event: String, timestamp: Double = Date().timeIntervalSince1970, payload: JSONValue? = nil) {
         self.event = event
         self.timestamp = timestamp
         self.payload = payload

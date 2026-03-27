@@ -125,7 +125,8 @@ StatusBarKit
 StatusBarIPC defines the wire protocol for communication between the StatusBar app and the `sbar` CLI (bundled in [StatusBar](https://github.com/hytfjwr/StatusBar)):
 
 - **`IPCRequest` / `IPCResponse`** — versioned request/response envelopes
-- **`IPCCommand`** — supported commands: `list`, `getWidget`, `setWidget`, `setGlobal`, `reload`
+- **`IPCCommand`** — supported commands: `list`, `getWidget`, `setWidget`, `setGlobal`, `reload`, `subscribe`, `trigger`
+- **`IPCEventEnvelope`** — string-based event name + `JSONValue?` payload, streamed as NDJSON to subscribers
 - **`IPCFraming`** — 4-byte length-prefixed message framing over Unix domain sockets
 - **`WidgetInfoDTO`** — serializable widget info for transfer between processes
 
