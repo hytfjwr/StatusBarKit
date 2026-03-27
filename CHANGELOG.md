@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-03-27
+
+- refactor!: string-based IPC event protocol (#25)
+
 ## [1.6.0] - 2026-03-26
 
 - feat: add trigger event system for plugin widgets (#23)
