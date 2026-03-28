@@ -7,6 +7,10 @@ import Foundation
 public enum BarEvent {
     /// Emitted when configuration is reloaded from disk.
     public static let configReloaded = "config_reloaded"
+    /// Emitted when a toast notification is shown.
+    public static let toastShown = "toast_shown"
+    /// Emitted when a toast notification is dismissed.
+    public static let toastDismissed = "toast_dismissed"
 }
 
 // MARK: - IPCEventEnvelope

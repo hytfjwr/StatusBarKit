@@ -107,6 +107,27 @@ make build
 
 This builds the dylib and auto-generates the required `manifest.json` for host discovery. See the template repository for the full project structure and build configuration.
 
+### 5. Post Toast Notifications
+
+Plugins can display toast notifications via `ToastService`:
+
+```swift
+import StatusBarKit
+
+// Simple toast
+ToastService.shared.post(ToastRequest(title: "Build Complete", level: .success))
+
+// Toast with action
+ToastService.shared.post(ToastRequest(
+    title: "Deploy Failed",
+    message: "Connection timed out",
+    level: .error,
+    duration: 10,
+    actionLabel: "View Logs",
+    actionShellCommand: "open /var/log/deploy.log"
+))
+```
+
 ## Architecture
 
 ```
@@ -117,6 +138,7 @@ StatusBarKit
 ├── Configuration     – YAML-based hot-reload config with WidgetConfigProvider
 ├── UI Components     – PopupPanel, glass effects, reusable popup building blocks
 ├── Theme System      – Runtime theme injection via ThemeProvider protocol
+├── Toast System      – ToastService for posting notifications from plugins
 └── Utilities         – ShellCommand, AppIconProvider, GraphDataBuffer
 ```
 
@@ -125,7 +147,7 @@ StatusBarKit
 StatusBarIPC defines the wire protocol for communication between the StatusBar app and the `sbar` CLI (bundled in [StatusBar](https://github.com/hytfjwr/StatusBar)):
 
 - **`IPCRequest` / `IPCResponse`** — versioned request/response envelopes
-- **`IPCCommand`** — supported commands: `list`, `getWidget`, `setWidget`, `setGlobal`, `reload`, `subscribe`, `trigger`
+- **`IPCCommand`** — supported commands: `list`, `getWidget`, `setWidget`, `setGlobal`, `reload`, `subscribe`, `trigger`, `showToast`
 - **`IPCEventEnvelope`** — string-based event name + `JSONValue?` payload, streamed as NDJSON to subscribers
 - **`IPCFraming`** — 4-byte length-prefixed message framing over Unix domain sockets
 - **`WidgetInfoDTO`** — serializable widget info for transfer between processes

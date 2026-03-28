@@ -47,6 +47,8 @@ public enum IPCCommand: Codable, Sendable, Equatable {
     case subscribe(events: [String])
     /// Send a custom event to plugin widgets that subscribe to the given event name.
     case trigger(event: String, payload: JSONValue?)
+    /// Show a toast notification.
+    case showToast(request: ToastRequest)
 }
 
 // MARK: - IPCResponse
@@ -84,6 +86,8 @@ public enum IPCPayload: Codable, Sendable, Equatable {
     case ok
     /// Acknowledgement for `.subscribe` — lists the events the server accepted.
     case subscribeAck(events: [String])
+    /// Response to `.showToast` — the assigned toast ID.
+    case toastID(String)
 }
 
 // MARK: - IPCError
