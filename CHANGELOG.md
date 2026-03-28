@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-03-28
+
+- feat: add toast notification API (#27)
+
 ## [1.7.0] - 2026-03-27
 
 - refactor!: string-based IPC event protocol (#25)
