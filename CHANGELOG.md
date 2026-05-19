@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-05-19
+
+- feat: add plugins.yml sync IPC commands (#29)
+
 ## [1.8.0] - 2026-03-28
 
 - feat: add toast notification API (#27)
