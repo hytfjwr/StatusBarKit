@@ -49,6 +49,11 @@ public enum IPCCommand: Codable, Sendable, Equatable {
     case trigger(event: String, payload: JSONValue?)
     /// Show a toast notification.
     case showToast(request: ToastRequest)
+    /// Sync plugins.yml against plugins-lock.yml and the installed plugin registry.
+    /// When `frozen` is true, the app resolves from plugins-lock.yml only and does not call GitHub.
+    case pluginsSync(frozen: Bool)
+    /// List plugin manifest entries with their resolved lock state.
+    case pluginsList
 }
 
 // MARK: - IPCResponse
@@ -88,6 +93,8 @@ public enum IPCPayload: Codable, Sendable, Equatable {
     case subscribeAck(events: [String])
     /// Response to `.showToast` — the assigned toast ID.
     case toastID(String)
+    /// Response to `.pluginsList`.
+    case pluginList([PluginManifestEntryDTO])
 }
 
 // MARK: - IPCError
@@ -100,4 +107,34 @@ public enum IPCError: Codable, Sendable, Equatable, Error {
     case invalidValue(key: String, reason: String)
     case versionMismatch(serverVersion: Int, clientVersion: Int)
     case internalError(String)
+}
+
+// MARK: - PluginManifestEntryDTO
+
+/// One entry from plugins.yml combined with its resolved lock state.
+public struct PluginManifestEntryDTO: Codable, Sendable, Equatable {
+    /// "github:owner/repo" format.
+    public let source: String
+    /// Version declared in plugins.yml ("1.2.0" or "latest").
+    public let declaredVersion: String
+    /// resolvedVersion from plugins-lock.yml; nil if unresolved.
+    public let resolvedVersion: String?
+    /// zipSHA256 from plugins-lock.yml; nil if unresolved.
+    public let zipSHA256: String?
+    /// Matching DylibPluginManifest.id; nil if unresolved.
+    public let pluginID: String?
+
+    public init(
+        source: String,
+        declaredVersion: String,
+        resolvedVersion: String?,
+        zipSHA256: String?,
+        pluginID: String?,
+    ) {
+        self.source = source
+        self.declaredVersion = declaredVersion
+        self.resolvedVersion = resolvedVersion
+        self.zipSHA256 = zipSHA256
+        self.pluginID = pluginID
+    }
 }
