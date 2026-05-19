@@ -180,4 +180,37 @@ struct IPCProtocolTests {
         let decoded = try JSONDecoder().decode(WidgetInfoDTO.self, from: data)
         #expect(decoded == dto)
     }
+
+    // MARK: - pluginsSync / pluginsList round-trips
+
+    @Test
+    func `pluginsSync command round-trips through Codable`() throws {
+        let cmd = IPCCommand.pluginsSync(frozen: true)
+        let request = IPCRequest(command: cmd)
+        let data = try JSONEncoder().encode(request)
+        let decoded = try JSONDecoder().decode(IPCRequest.self, from: data)
+        #expect(decoded.command == cmd)
+    }
+
+    @Test
+    func `pluginList payload round-trips through Codable`() throws {
+        let entry = PluginManifestEntryDTO(
+            source: "github:acme/foo-widget",
+            declaredVersion: "1.2.0",
+            resolvedVersion: "1.2.0",
+            zipSHA256: "abc123",
+            pluginID: "com.acme.foo",
+        )
+        let response = IPCResponse(
+            requestID: "test-plugins-1",
+            result: .success(.pluginList([entry])),
+        )
+        let data = try JSONEncoder().encode(response)
+        let decoded = try JSONDecoder().decode(IPCResponse.self, from: data)
+        if case let .success(.pluginList(entries)) = decoded.result {
+            #expect(entries == [entry])
+        } else {
+            Issue.record("Expected success with pluginList")
+        }
+    }
 }
