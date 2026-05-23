@@ -10,8 +10,13 @@ public enum IPCFraming {
     public static let maxMessageSize: UInt32 = 1_048_576
 
     /// Encode a `Codable` value into a length-prefixed frame.
+    ///
+    /// `Date` fields are serialized as Unix-epoch seconds (Double) so the wire
+    /// format is unambiguous for non-Swift consumers.
     public static func encode(_ value: some Encodable) throws -> Data {
-        let body = try JSONEncoder().encode(value)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .secondsSince1970
+        let body = try encoder.encode(value)
         guard body.count <= maxMessageSize else {
             throw IPCFramingError.messageTooLarge(body.count)
         }
@@ -42,6 +47,8 @@ public enum IPCFraming {
     }
 
     /// Read a length-prefixed frame from a file descriptor and decode it.
+    ///
+    /// `Date` fields are decoded from Unix-epoch seconds (Double), matching `encode`.
     public static func readFrame<T: Decodable>(fd: Int32, as type: T.Type) throws -> T? {
         guard let header = readExact(fd: fd, count: 4) else {
             return nil
@@ -53,7 +60,9 @@ public enum IPCFraming {
         guard let body = readExact(fd: fd, count: Int(length)) else {
             return nil
         }
-        return try JSONDecoder().decode(type, from: body)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        return try decoder.decode(type, from: body)
     }
 
     /// Write raw bytes to a file descriptor, retrying partial writes.

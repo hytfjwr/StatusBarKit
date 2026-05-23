@@ -213,4 +213,75 @@ struct IPCProtocolTests {
             Issue.record("Expected success with pluginList")
         }
     }
+
+    @Test
+    func `pluginsInstall command (with version) round-trips through Codable`() throws {
+        let cmd = IPCCommand.pluginsInstall(source: "github:acme/foo-widget", version: "1.2.0")
+        let request = IPCRequest(command: cmd)
+        let data = try JSONEncoder().encode(request)
+        let decoded = try JSONDecoder().decode(IPCRequest.self, from: data)
+        #expect(decoded.command == cmd)
+    }
+
+    @Test
+    func `pluginsInstall command (nil version) round-trips through Codable`() throws {
+        let cmd = IPCCommand.pluginsInstall(source: "github:acme/foo-widget", version: nil)
+        let request = IPCRequest(command: cmd)
+        let data = try JSONEncoder().encode(request)
+        let decoded = try JSONDecoder().decode(IPCRequest.self, from: data)
+        #expect(decoded.command == cmd)
+    }
+
+    @Test
+    func `pluginsUninstall command round-trips through Codable`() throws {
+        let cmd = IPCCommand.pluginsUninstall(source: "github:acme/foo-widget")
+        let request = IPCRequest(command: cmd)
+        let data = try JSONEncoder().encode(request)
+        let decoded = try JSONDecoder().decode(IPCRequest.self, from: data)
+        #expect(decoded.command == cmd)
+    }
+
+    @Test
+    func `pluginInstalled payload round-trips through Codable`() throws {
+        let dto = InstalledPluginDTO(
+            id: "com.acme.foo",
+            name: "Foo Widget",
+            version: "1.2.0",
+            bundleName: "FooWidget.statusplugin",
+            source: "github:acme/foo-widget",
+            installedAt: Date(timeIntervalSince1970: 1_700_000_000),
+        )
+        let response = IPCResponse(
+            requestID: "test-plugins-install-1",
+            result: .success(.pluginInstalled(dto)),
+        )
+        let data = try JSONEncoder().encode(response)
+        let decoded = try JSONDecoder().decode(IPCResponse.self, from: data)
+        if case let .success(.pluginInstalled(installed)) = decoded.result {
+            #expect(installed == dto)
+        } else {
+            Issue.record("Expected success with pluginInstalled")
+        }
+    }
+
+    @Test
+    func `pluginInstalled installedAt is framed as Unix epoch seconds`() throws {
+        let dto = InstalledPluginDTO(
+            id: "com.acme.foo",
+            name: "Foo Widget",
+            version: "1.2.0",
+            bundleName: "FooWidget.statusplugin",
+            source: "github:acme/foo-widget",
+            installedAt: Date(timeIntervalSince1970: 1_700_000_000),
+        )
+        let response = IPCResponse(
+            requestID: "test-plugins-install-2",
+            result: .success(.pluginInstalled(dto)),
+        )
+        let frame = try IPCFraming.encode(response)
+        let body = String(data: Data(frame.dropFirst(4)), encoding: .utf8) ?? ""
+        // The wire format must use Unix-epoch seconds so non-Swift consumers
+        // don't misinterpret the value as Apple-reference-date seconds.
+        #expect(body.contains("\"installedAt\":1700000000"))
+    }
 }
