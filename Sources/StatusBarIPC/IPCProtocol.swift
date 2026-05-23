@@ -55,8 +55,8 @@ public enum IPCCommand: Codable, Sendable, Equatable {
     /// List plugin manifest entries with their resolved lock state.
     case pluginsList
     /// Install a plugin declared by source ("github:owner/repo"). When `version` is nil,
-    /// installs the latest GitHub release. Writes plugins.yml + plugins-lock.yml and
-    /// returns the installed plugin record.
+    /// installs the latest GitHub release. Writes plugins.yml + plugins-lock.yml,
+    /// updates the in-memory plugin registry, and returns the installed plugin record.
     case pluginsInstall(source: String, version: String?)
     /// Uninstall the plugin whose plugins.yml entry matches `source` ("github:owner/repo").
     /// Removes the bundle, updates plugins.yml + plugins-lock.yml + registry.
@@ -89,6 +89,7 @@ public enum IPCResult: Codable, Sendable, Equatable {
 // MARK: - IPCPayload
 
 /// Success payloads for each command type.
+/// Not `@frozen` — new cases can be added in minor versions.
 public enum IPCPayload: Codable, Sendable, Equatable {
     /// Response to `.list`.
     case widgetList([WidgetInfoDTO])
@@ -162,7 +163,7 @@ public struct InstalledPluginDTO: Codable, Sendable, Equatable {
     public let bundleName: String
     /// "github:owner/repo" — the plugins.yml source string.
     public let source: String
-    /// Wall-clock install time.
+    /// Wall-clock install time. Serialized over IPC as Unix-epoch seconds (Double).
     public let installedAt: Date
 
     public init(

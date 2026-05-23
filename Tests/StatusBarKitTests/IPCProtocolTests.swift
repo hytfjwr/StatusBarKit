@@ -263,4 +263,25 @@ struct IPCProtocolTests {
             Issue.record("Expected success with pluginInstalled")
         }
     }
+
+    @Test
+    func `pluginInstalled installedAt is framed as Unix epoch seconds`() throws {
+        let dto = InstalledPluginDTO(
+            id: "com.acme.foo",
+            name: "Foo Widget",
+            version: "1.2.0",
+            bundleName: "FooWidget.statusplugin",
+            source: "github:acme/foo-widget",
+            installedAt: Date(timeIntervalSince1970: 1_700_000_000),
+        )
+        let response = IPCResponse(
+            requestID: "test-plugins-install-2",
+            result: .success(.pluginInstalled(dto)),
+        )
+        let frame = try IPCFraming.encode(response)
+        let body = String(data: Data(frame.dropFirst(4)), encoding: .utf8) ?? ""
+        // The wire format must use Unix-epoch seconds so non-Swift consumers
+        // don't misinterpret the value as Apple-reference-date seconds.
+        #expect(body.contains("\"installedAt\":1700000000"))
+    }
 }
