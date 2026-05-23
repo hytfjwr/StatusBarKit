@@ -54,6 +54,13 @@ public enum IPCCommand: Codable, Sendable, Equatable {
     case pluginsSync(frozen: Bool)
     /// List plugin manifest entries with their resolved lock state.
     case pluginsList
+    /// Install a plugin declared by source ("github:owner/repo"). When `version` is nil,
+    /// installs the latest GitHub release. Writes plugins.yml + plugins-lock.yml and
+    /// returns the installed plugin record.
+    case pluginsInstall(source: String, version: String?)
+    /// Uninstall the plugin whose plugins.yml entry matches `source` ("github:owner/repo").
+    /// Removes the bundle, updates plugins.yml + plugins-lock.yml + registry.
+    case pluginsUninstall(source: String)
 }
 
 // MARK: - IPCResponse
@@ -95,6 +102,8 @@ public enum IPCPayload: Codable, Sendable, Equatable {
     case toastID(String)
     /// Response to `.pluginsList`.
     case pluginList([PluginManifestEntryDTO])
+    /// Response to `.pluginsInstall`.
+    case pluginInstalled(InstalledPluginDTO)
 }
 
 // MARK: - IPCError
@@ -136,5 +145,39 @@ public struct PluginManifestEntryDTO: Codable, Sendable, Equatable {
         self.resolvedVersion = resolvedVersion
         self.zipSHA256 = zipSHA256
         self.pluginID = pluginID
+    }
+}
+
+// MARK: - InstalledPluginDTO
+
+/// One installed plugin record returned by `.pluginsInstall`.
+public struct InstalledPluginDTO: Codable, Sendable, Equatable {
+    /// DylibPluginManifest.id (reverse-DNS).
+    public let id: String
+    /// Display name from the plugin manifest.
+    public let name: String
+    /// Installed version (normalized, no leading "v").
+    public let version: String
+    /// On-disk bundle name (e.g. "MyWidget.statusplugin").
+    public let bundleName: String
+    /// "github:owner/repo" — the plugins.yml source string.
+    public let source: String
+    /// Wall-clock install time.
+    public let installedAt: Date
+
+    public init(
+        id: String,
+        name: String,
+        version: String,
+        bundleName: String,
+        source: String,
+        installedAt: Date,
+    ) {
+        self.id = id
+        self.name = name
+        self.version = version
+        self.bundleName = bundleName
+        self.source = source
+        self.installedAt = installedAt
     }
 }
