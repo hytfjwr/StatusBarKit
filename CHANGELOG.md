@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-05-23
+
+- feat: add plugins install/uninstall IPC commands (#31)
+
 ## [1.9.0] - 2026-05-19
 
 - feat: add plugins.yml sync IPC commands (#29)
