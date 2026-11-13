@@ -24,7 +24,6 @@ let package = Package(
             ],
             linkerSettings: [
                 .linkedFramework("AppKit"),
-                .unsafeFlags(["-Xlinker", "-install_name", "-Xlinker", "@rpath/libStatusBarKit.dylib"]),
             ]
         ),
         .testTarget(
