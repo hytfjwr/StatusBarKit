@@ -36,10 +36,10 @@ jobs:
           curl -sLo /tmp/swiftlint.zip "https://github.com/realm/SwiftLint/releases/download/$SWIFTLINT_VERSION/portable_swiftlint.zip"
           unzip -o /tmp/swiftlint.zip -d /tmp/swiftlint
           sudo cp /tmp/swiftlint/swiftlint /usr/local/bin/
-          swiftlint version
+          /usr/local/bin/swiftlint version
 
       - name: Lint
-        run: swiftlint lint --strict
+        run: /usr/local/bin/swiftlint lint --strict
 
   version-check:
     if: >-
@@ -82,7 +82,7 @@ jobs:
           unzip -o /tmp/swiftformat.zip -d /tmp/swiftformat
           BINARY=$(find /tmp/swiftformat -name swiftformat -type f -perm +111 | grep macos | head -1)
           sudo cp "$BINARY" /usr/local/bin/swiftformat
-          swiftformat --version
+          /usr/local/bin/swiftformat --version
 
       - name: Check formatting
-        run: swiftformat --lint .
+        run: /usr/local/bin/swiftformat --lint .
