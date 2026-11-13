@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.10.1] - 2026-11-13
+
+- fix: drop propagating install_name linkerSetting breaking plugin links
+
 ## [1.10.0] - 2026-05-23
 
 - feat: add plugins install/uninstall IPC commands (#31)
